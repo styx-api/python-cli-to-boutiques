@@ -33,7 +33,10 @@ runs:
       shell: bash
 
     - name: Create argdump file
-      run: python ./scripts/main.py $LOCATION $PARSER --output argdump.json
+      run: |
+        ls .
+        pwd
+        python ./scripts/main.py $LOCATION $PARSER --output argdump.json
       env:
         LOCATION: ${{ inputs.location }}
         PARSER: ${{ inputs.parser }}
