@@ -1,0 +1,695 @@
+{
+  "$schema": "https://niwrap.dev/argdump/schema-v1.json",
+  "$env": {
+    "python_version": "3.9.12",
+    "python_implementation": "CPython",
+    "platform_system": "Darwin",
+    "platform_release": "25.4.0",
+    "platform_machine": "arm64",
+    "argdump_version": "0.1.2"
+  },
+  "prog": "argdumprun.py",
+  "description": "MRIQC 24.0.0\nAutomated Quality Control and visual reports for Quality Assessment of structural (T1w, T2w) and functional MRI of the brain.\n\nIMPORTANT: Anonymized quality metrics (IQMs) will be submitted to MRIQC's metrics repository. Submission of IQMs can be disabled using the ``--no-sub`` argument. Please visit https://mriqc.readthedocs.io/en/latest/dsa.html to revise MRIQC's Data Sharing Agreement.",
+  "formatter_class": "ArgumentDefaultsHelpFormatter",
+  "actions": [
+    {
+      "option_strings": [
+        "-h",
+        "--help"
+      ],
+      "dest": "help",
+      "action_type": "help",
+      "nargs": 0,
+      "default": {
+        "__argparse__": "SUPPRESS"
+      },
+      "help": "show this help message and exit"
+    },
+    {
+      "option_strings": [],
+      "dest": "bids_dir",
+      "action_type": "store",
+      "type_info": {
+        "name": "functools.partial(<function _build_parser.<locals>._path_exists at 0x100c41c10>, parser=ArgumentParser(prog='argdumprun.py', usage=None, description=\"MRIQC 24.0.0\\nAutomated Quality Control and visual reports for Quality Assessment of structural (T1w, T2w) and functional MRI of the brain.\\n\\nIMPORTANT: Anonymized quality metrics (IQMs) will be submitted to MRIQC's metrics repository. Submission of IQMs can be disabled using the ``--no-sub`` argument. Please visit https://mriqc.readthedocs.io/en/latest/dsa.html to revise MRIQC's Data Sharing Agreement.\", formatter_class=<class 'argparse.ArgumentDefaultsHelpFormatter'>, conflict_handler='error', add_help=True))",
+        "serializable": false
+      },
+      "required": true,
+      "help": "The root folder of a BIDS valid dataset (sub-XXXXX folders should be found at the top level in this folder)."
+    },
+    {
+      "option_strings": [],
+      "dest": "output_dir",
+      "action_type": "store",
+      "type_info": {
+        "name": "Path",
+        "module": "pathlib"
+      },
+      "required": true,
+      "help": "The directory where the output files should be stored. If you are running group level analysis this folder should be prepopulated with the results of the participant level analysis."
+    },
+    {
+      "option_strings": [],
+      "dest": "analysis_level",
+      "action_type": "store",
+      "nargs": "+",
+      "choices": [
+        "participant",
+        "group"
+      ],
+      "required": true,
+      "help": "Level of the analysis that will be performed. Multiple participant level analyses can be run independently (in parallel) using the same output_dir."
+    },
+    {
+      "option_strings": [
+        "--version"
+      ],
+      "dest": "version",
+      "action_type": "version",
+      "nargs": 0,
+      "default": {
+        "__argparse__": "SUPPRESS"
+      },
+      "help": "show program's version number and exit",
+      "version": "MRIQC v24.0.0"
+    },
+    {
+      "option_strings": [
+        "-v",
+        "--verbose"
+      ],
+      "dest": "verbose_count",
+      "action_type": "count",
+      "nargs": 0,
+      "default": 0,
+      "help": "Increases log verbosity for each occurrence, debug level is -vvv."
+    },
+    {
+      "option_strings": [
+        "--species"
+      ],
+      "dest": "species",
+      "action_type": "store",
+      "default": "human",
+      "type_info": {
+        "name": "str",
+        "builtin": true
+      },
+      "choices": [
+        "human",
+        "rat"
+      ],
+      "help": "Use appropriate template for population"
+    },
+    {
+      "option_strings": [
+        "--participant-label",
+        "--participant_label",
+        "--participant-labels",
+        "--participant_labels"
+      ],
+      "dest": "participant_label",
+      "action_type": "unknown",
+      "nargs": "+",
+      "help": "A space delimited list of participant identifiers or a single identifier (the sub- prefix can be removed).",
+      "custom_action_class": "ParticipantLabelAction"
+    },
+    {
+      "option_strings": [
+        "--bids-filter-file"
+      ],
+      "dest": "bids_filter_file",
+      "action_type": "store",
+      "type_info": {
+        "name": "Path",
+        "module": "pathlib"
+      },
+      "help": "a JSON file describing custom BIDS input filter using pybids {<suffix>:{<entity>:<filter>,...},...} (https://github.com/bids-standard/pybids/blob/master/src/bids/layout/config/bids.json)",
+      "metavar": "PATH"
+    },
+    {
+      "option_strings": [
+        "--session-id"
+      ],
+      "dest": "session_id",
+      "action_type": "store",
+      "nargs": "*",
+      "type_info": {
+        "name": "str",
+        "builtin": true
+      },
+      "help": "Filter input dataset by session ID."
+    },
+    {
+      "option_strings": [
+        "--run-id"
+      ],
+      "dest": "run_id",
+      "action_type": "store",
+      "nargs": "*",
+      "type_info": {
+        "name": "int",
+        "builtin": true
+      },
+      "help": "DEPRECATED - This argument will be disabled. Use ``--bids-filter-file`` instead."
+    },
+    {
+      "option_strings": [
+        "--task-id"
+      ],
+      "dest": "task_id",
+      "action_type": "store",
+      "nargs": "*",
+      "type_info": {
+        "name": "str",
+        "builtin": true
+      },
+      "help": "Filter input dataset by task ID."
+    },
+    {
+      "option_strings": [
+        "-m",
+        "--modalities"
+      ],
+      "dest": "modalities",
+      "action_type": "store",
+      "nargs": "*",
+      "default": [
+        "T1w",
+        "T2w",
+        "bold",
+        "dwi"
+      ],
+      "choices": [
+        "T1w",
+        "T2w",
+        "bold",
+        "dwi"
+      ],
+      "help": "Filter input dataset by MRI type."
+    },
+    {
+      "option_strings": [
+        "--dsname"
+      ],
+      "dest": "dsname",
+      "action_type": "store",
+      "type_info": {
+        "name": "str",
+        "builtin": true
+      },
+      "help": "A dataset name."
+    },
+    {
+      "option_strings": [
+        "--bids-database-dir"
+      ],
+      "dest": "bids_database_dir",
+      "action_type": "store",
+      "help": "Path to an existing PyBIDS database folder, for faster indexing (especially useful for large datasets).",
+      "metavar": "PATH"
+    },
+    {
+      "option_strings": [
+        "--bids-database-wipe"
+      ],
+      "dest": "bids_database_wipe",
+      "action_type": "store_true",
+      "nargs": 0,
+      "const": true,
+      "default": false,
+      "help": "Wipe out previously existing BIDS indexing caches, forcing re-indexing."
+    },
+    {
+      "option_strings": [
+        "--no-datalad-get"
+      ],
+      "dest": "datalad_get",
+      "action_type": "store_false",
+      "nargs": 0,
+      "const": false,
+      "default": true,
+      "help": "Disable attempting to get remote files in DataLad datasets."
+    },
+    {
+      "option_strings": [
+        "--nprocs",
+        "--n_procs",
+        "--n_cpus",
+        "-n-cpus"
+      ],
+      "dest": "nprocs",
+      "action_type": "store",
+      "type_info": {
+        "name": "functools.partial(<function _build_parser.<locals>._min_one at 0x129c9a940>, parser=ArgumentParser(prog='argdumprun.py', usage=None, description=\"MRIQC 24.0.0\\nAutomated Quality Control and visual reports for Quality Assessment of structural (T1w, T2w) and functional MRI of the brain.\\n\\nIMPORTANT: Anonymized quality metrics (IQMs) will be submitted to MRIQC's metrics repository. Submission of IQMs can be disabled using the ``--no-sub`` argument. Please visit https://mriqc.readthedocs.io/en/latest/dsa.html to revise MRIQC's Data Sharing Agreement.\", formatter_class=<class 'argparse.ArgumentDefaultsHelpFormatter'>, conflict_handler='error', add_help=True))",
+        "serializable": false
+      },
+      "help": "Maximum number of simultaneously running parallel processes executed by *MRIQC* (e.g., several instances of ANTs' registration). However, when ``--nprocs`` is greater or equal to the ``--omp-nthreads`` option, it also sets the maximum number of threads that simultaneously running processes may aggregate (meaning, with ``--nprocs 16 --omp-nthreads 8`` a maximum of two 8-CPU-threaded processes will be running at a given time). Under this mode of operation, ``--nprocs`` sets the maximum number of processors that can be assigned work within an *MRIQC* job, which includes all the processors used by currently running single- and multi-threaded processes. If ``None``, the number of CPUs available will be automatically assigned (which may not be what you want in, e.g., shared systems like a HPC cluster."
+    },
+    {
+      "option_strings": [
+        "--omp-nthreads",
+        "--ants-nthreads"
+      ],
+      "dest": "omp_nthreads",
+      "action_type": "store",
+      "type_info": {
+        "name": "functools.partial(<function _build_parser.<locals>._min_one at 0x129c9a940>, parser=ArgumentParser(prog='argdumprun.py', usage=None, description=\"MRIQC 24.0.0\\nAutomated Quality Control and visual reports for Quality Assessment of structural (T1w, T2w) and functional MRI of the brain.\\n\\nIMPORTANT: Anonymized quality metrics (IQMs) will be submitted to MRIQC's metrics repository. Submission of IQMs can be disabled using the ``--no-sub`` argument. Please visit https://mriqc.readthedocs.io/en/latest/dsa.html to revise MRIQC's Data Sharing Agreement.\", formatter_class=<class 'argparse.ArgumentDefaultsHelpFormatter'>, conflict_handler='error', add_help=True))",
+        "serializable": false
+      },
+      "help": "Maximum number of threads that multi-threaded processes executed by *MRIQC* (e.g., ANTs' registration) can use. If ``None``, the number of CPUs available will be automatically assigned (which may not be what you want in, e.g., shared systems like a HPC cluster."
+    },
+    {
+      "option_strings": [
+        "--mem",
+        "--mem_gb",
+        "--mem-gb"
+      ],
+      "dest": "memory_gb",
+      "action_type": "store",
+      "type_info": {
+        "name": "_to_gb",
+        "module": "mriqc.cli.parser"
+      },
+      "help": "Upper bound memory limit for MRIQC processes."
+    },
+    {
+      "option_strings": [
+        "--testing"
+      ],
+      "dest": "debug",
+      "action_type": "store_true",
+      "nargs": 0,
+      "const": true,
+      "default": false,
+      "help": "Use testing settings for a minimal footprint."
+    },
+    {
+      "option_strings": [
+        "-f",
+        "--float32"
+      ],
+      "dest": "float32",
+      "action_type": "store_true",
+      "nargs": 0,
+      "const": true,
+      "default": true,
+      "help": "Cast the input data to float32 if it's represented in higher precision (saves space and improves performance)."
+    },
+    {
+      "option_strings": [
+        "--pdb"
+      ],
+      "dest": "pdb",
+      "action_type": "store_true",
+      "nargs": 0,
+      "const": true,
+      "default": false,
+      "help": "Open Python debugger (pdb) on exceptions."
+    },
+    {
+      "option_strings": [
+        "-w",
+        "--work-dir"
+      ],
+      "dest": "work_dir",
+      "action_type": "store",
+      "default": {
+        "__repr__": "PosixPath('/Users/melaniegarcia/Documents/postdoc/boutiques_project/argparse-to-boutiques/work')",
+        "__type_name__": "PosixPath",
+        "__serializable__": false
+      },
+      "type_info": {
+        "name": "Path",
+        "module": "pathlib"
+      },
+      "help": "Path where intermediate results should be stored."
+    },
+    {
+      "option_strings": [
+        "--verbose-reports"
+      ],
+      "dest": "verbose_reports",
+      "action_type": "store_true",
+      "nargs": 0,
+      "const": true,
+      "default": false
+    },
+    {
+      "option_strings": [
+        "--reports-only"
+      ],
+      "dest": "reports_only",
+      "action_type": "store_true",
+      "nargs": 0,
+      "const": true,
+      "default": false
+    },
+    {
+      "option_strings": [
+        "--write-graph"
+      ],
+      "dest": "write_graph",
+      "action_type": "store_true",
+      "nargs": 0,
+      "const": true,
+      "default": false,
+      "help": "Write workflow graph."
+    },
+    {
+      "option_strings": [
+        "--dry-run"
+      ],
+      "dest": "dry_run",
+      "action_type": "store_true",
+      "nargs": 0,
+      "const": true,
+      "default": false,
+      "help": "Do not run the workflow."
+    },
+    {
+      "option_strings": [
+        "--resource-monitor",
+        "--profile"
+      ],
+      "dest": "resource_monitor",
+      "action_type": "store_true",
+      "nargs": 0,
+      "const": true,
+      "default": false,
+      "help": "Hook up the resource profiler callback to nipype."
+    },
+    {
+      "option_strings": [
+        "--use-plugin"
+      ],
+      "dest": "use_plugin",
+      "action_type": "store",
+      "type_info": {
+        "name": "Path",
+        "module": "pathlib"
+      },
+      "help": "Nipype plugin configuration file."
+    },
+    {
+      "option_strings": [
+        "--crashfile-format"
+      ],
+      "dest": "crashfile_format",
+      "action_type": "store",
+      "default": "txt",
+      "type_info": {
+        "name": "str",
+        "builtin": true
+      },
+      "choices": [
+        "txt",
+        "pklz"
+      ],
+      "help": "Nipype crashfile format"
+    },
+    {
+      "option_strings": [
+        "--no-sub"
+      ],
+      "dest": "no_sub",
+      "action_type": "store_true",
+      "nargs": 0,
+      "const": true,
+      "default": false,
+      "help": "Turn off submission of anonymized quality metrics to MRIQC's metrics repository."
+    },
+    {
+      "option_strings": [
+        "--email"
+      ],
+      "dest": "email",
+      "action_type": "store",
+      "default": "",
+      "type_info": {
+        "name": "str",
+        "builtin": true
+      },
+      "help": "Email address to include with quality metric submission."
+    },
+    {
+      "option_strings": [
+        "--webapi-url"
+      ],
+      "dest": "webapi_url",
+      "action_type": "store",
+      "type_info": {
+        "name": "str",
+        "builtin": true
+      },
+      "help": "IP address where the MRIQC WebAPI is listening."
+    },
+    {
+      "option_strings": [
+        "--webapi-port"
+      ],
+      "dest": "webapi_port",
+      "action_type": "store",
+      "type_info": {
+        "name": "int",
+        "builtin": true
+      },
+      "help": "Port where the MRIQC WebAPI is listening."
+    },
+    {
+      "option_strings": [
+        "--upload-strict"
+      ],
+      "dest": "upload_strict",
+      "action_type": "store_true",
+      "nargs": 0,
+      "const": true,
+      "default": false,
+      "help": "Upload will fail if upload is strict."
+    },
+    {
+      "option_strings": [
+        "--notrack"
+      ],
+      "dest": "notrack",
+      "action_type": "store_true",
+      "nargs": 0,
+      "const": true,
+      "default": false,
+      "help": "Opt-out of sending tracking information of this run to the NiPreps developers. This information helps to improve MRIQC and provides an indicator of real world usage  crucial for obtaining funding."
+    },
+    {
+      "option_strings": [
+        "--ants-float"
+      ],
+      "dest": "ants_float",
+      "action_type": "store_true",
+      "nargs": 0,
+      "const": true,
+      "default": false,
+      "help": "Use float number precision on ANTs computations."
+    },
+    {
+      "option_strings": [
+        "--ants-settings"
+      ],
+      "dest": "ants_settings",
+      "action_type": "store",
+      "help": "Path to JSON file with settings for ANTs."
+    },
+    {
+      "option_strings": [
+        "--min-dwi-length"
+      ],
+      "dest": "min_len_dwi",
+      "action_type": "store",
+      "default": 7,
+      "type_info": {
+        "name": "int",
+        "builtin": true
+      },
+      "help": "Drop DWI runs with fewer orientations than this threshold."
+    },
+    {
+      "option_strings": [
+        "--min-bold-length"
+      ],
+      "dest": "min_len_bold",
+      "action_type": "store",
+      "default": 5,
+      "type_info": {
+        "name": "int",
+        "builtin": true
+      },
+      "help": "Drop BOLD runs with fewer time points than this threshold."
+    },
+    {
+      "option_strings": [
+        "--fft-spikes-detector"
+      ],
+      "dest": "fft_spikes_detector",
+      "action_type": "store_true",
+      "nargs": 0,
+      "const": true,
+      "default": false,
+      "help": "Turn on FFT based spike detector (slow)."
+    },
+    {
+      "option_strings": [
+        "--fd_thres"
+      ],
+      "dest": "fd_thres",
+      "action_type": "store",
+      "default": 0.2,
+      "type_info": {
+        "name": "float",
+        "builtin": true
+      },
+      "help": "Threshold on framewise displacement estimates to detect outliers."
+    },
+    {
+      "option_strings": [
+        "--deoblique"
+      ],
+      "dest": "deoblique",
+      "action_type": "store_true",
+      "nargs": 0,
+      "const": true,
+      "default": false,
+      "help": "Deoblique the functional scans during head motion correction preprocessing."
+    },
+    {
+      "option_strings": [
+        "--despike"
+      ],
+      "dest": "despike",
+      "action_type": "store_true",
+      "nargs": 0,
+      "const": true,
+      "default": false,
+      "help": "Despike the functional scans during head motion correction preprocessing."
+    },
+    {
+      "option_strings": [
+        "--start-idx"
+      ],
+      "dest": "start_idx",
+      "action_type": "unknown",
+      "type_info": {
+        "name": "int",
+        "builtin": true
+      },
+      "help": "DEPRECATED Initial volume in functional timeseries that should be considered for preprocessing.",
+      "custom_action_class": "DeprecateAction"
+    },
+    {
+      "option_strings": [
+        "--stop-idx"
+      ],
+      "dest": "stop_idx",
+      "action_type": "unknown",
+      "type_info": {
+        "name": "int",
+        "builtin": true
+      },
+      "help": "DEPRECATED Final volume in functional timeseries that should be considered for preprocessing.",
+      "custom_action_class": "DeprecateAction"
+    }
+  ],
+  "argument_groups": [
+    {
+      "title": "positional arguments",
+      "description": null,
+      "actions": [
+        "bids_dir",
+        "output_dir",
+        "analysis_level"
+      ]
+    },
+    {
+      "title": "optional arguments",
+      "description": null,
+      "actions": [
+        "help",
+        "version",
+        "verbose_count",
+        "species"
+      ]
+    },
+    {
+      "title": "Options for filtering BIDS queries",
+      "description": null,
+      "actions": [
+        "participant_label",
+        "bids_filter_file",
+        "session_id",
+        "run_id",
+        "task_id",
+        "modalities",
+        "dsname",
+        "bids_database_dir",
+        "bids_database_wipe",
+        "datalad_get"
+      ]
+    },
+    {
+      "title": "Options to handle performance",
+      "description": null,
+      "actions": [
+        "nprocs",
+        "omp_nthreads",
+        "memory_gb",
+        "debug",
+        "float32",
+        "pdb"
+      ]
+    },
+    {
+      "title": "Instrumental options",
+      "description": null,
+      "actions": [
+        "work_dir",
+        "verbose_reports",
+        "reports_only",
+        "write_graph",
+        "dry_run",
+        "resource_monitor",
+        "use_plugin",
+        "crashfile_format",
+        "no_sub",
+        "email",
+        "webapi_url",
+        "webapi_port",
+        "upload_strict",
+        "notrack"
+      ]
+    },
+    {
+      "title": "Specific settings for ANTs",
+      "description": null,
+      "actions": [
+        "ants_float",
+        "ants_settings"
+      ]
+    },
+    {
+      "title": "Diffusion MRI workflow configuration",
+      "description": null,
+      "actions": [
+        "min_len_dwi"
+      ]
+    },
+    {
+      "title": "Functional MRI workflow configuration",
+      "description": null,
+      "actions": [
+        "min_len_bold",
+        "fft_spikes_detector",
+        "fd_thres",
+        "deoblique",
+        "despike",
+        "start_idx",
+        "stop_idx"
+      ]
+    }
+  ]
+}
