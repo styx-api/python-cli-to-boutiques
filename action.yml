@@ -18,6 +18,11 @@ runs:
   using: composite
   steps:
 
+    - name: Move to action path
+      run: |
+        cd ${{ github.action_path }}
+      shell: bash
+
     - name: Set up Node.js
       uses: actions/setup-node@v6
 
