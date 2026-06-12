@@ -35,7 +35,7 @@ def run_argdump(location: str, output_path: Path, indent=DEFAULT_INDENT):
     parser_to_serialize = load_parser(module_path, parser_name)
     serialized_parser = argdump.dumps(parser_to_serialize, indent=indent)
     output_path.parent.mkdir(parents=True, exist_ok=True)
-    output_path.write_text(serialized_parser)
+    output_path.write_text(f"{serialized_parser}\n")
 
 
 def build_parser() -> argparse.ArgumentParser:
