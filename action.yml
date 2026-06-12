@@ -1,0 +1,58 @@
+name: Argparse to Boutiques
+description: Create a Boutiques descriptor for a Python CLI based on `argparse.ArgumentParser`
+inputs:
+  parser-location:
+    description: Module path to and name of function that produces the `argparse.ArgumentParser` object. E.g., "my_package.my_module:my_func_name"
+    required: true
+  output-path:
+    description: Where the output Boutiques description file should be written
+    required: true
+  repository:
+    description: GitHub repository for the package
+    required: false
+    default: ${{ github.repository }}
+  python-version:
+    description: Python version to use
+    required: false
+    default: 3.x
+runs:
+  using: composite
+  steps:
+
+    - name: Check out the repository
+      uses: actions/checkout@v6
+      with:
+        repository: ${{ inputs.repository }}
+
+    - name: Set up Node.js
+      uses: actions/setup-node@v6
+
+    - name: Install styx
+      run: |
+        npm install @styx-api/core
+
+    - name: Set up Python
+      uses: actions/setup-python@v6
+      with:
+        python-version: ${{ inputs.python-version }}
+
+    - name: Install Python dependencies
+      run: |
+        pip install -U pip
+        pip install argdump
+        pip install .
+
+    - name: Create argdump file
+      run: ./scripts/argdumprun.py $PARSER_LOCATION --output argdump.json
+      env:
+        PARSER_LOCATION: ${{ inputs.parser-location }}
+
+    - name: Create the Boutiques descriptor
+      run: |
+        npx -y --package @styx-api/cli styx build argdump.json --out styx-out --backend boutiques
+
+    - name: Move descriptor
+      run: |
+        mv ./styx-out/boutiques/descriptor.json $OUTPUT_PATH
+      env:
+        OUTPUT_PATH: ${{ inputs.output-path }}
