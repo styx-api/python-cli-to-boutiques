@@ -31,20 +31,20 @@ runs:
         pip install argdump
 
         # create argdump from argparse
-        python ./scripts/run_argdump.py $LOCATION $PARSER --output argdump.json
-        cat argdump.json
+        python ./scripts/run_argdump.py --output $ARGDUMP_FILE $PARSER_LOCATION
+        cat $ARGDUMP_FILE
 
         # create boutiques descriptor from argdump
-        npx -y --package @styx-api/cli styx build argdump.json --out styx-out --backend boutiques
+        npx -y --package @styx-api/cli styx build $ARGDUMP_FILE --out styx-out --backend boutiques
 
         # move descriptor to output path
         mkdir -p $(dirname $OUTPUT_PATH)
         mv ./styx-out/boutiques/descriptor.json $OUTPUT_PATH
         cat $OUTPUT_PATH
       env:
-        LOCATION: ${{ inputs.location }}
-        PARSER: ${{ inputs.parser }}
+        PARSER_LOCATION: ${{ inputs.parser-location }}
         OUTPUT_PATH: ${{ github.workspace }}/${{ inputs.output-path }}
+        ARGDUMP_FILE: argdump.json
       shell: bash
 
     - name: Open pull request
