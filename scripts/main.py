@@ -11,7 +11,7 @@ Examples
 --------
 Dotted module path (works when the package is importable / installed):
 
-    python main.py mriqc.cli.parser --func _build_parser --output mriqc.json
+    python main.py mriqc.cli.parser _build_parser --output mriqc.json
 
 A standalone .py file, adding its directory to the import path so its
 sibling imports resolve:
@@ -56,9 +56,9 @@ def load_attr(location: str, attr_name: str):
         ) from exc
 
 
-def build_parser_json(location: str, func_name: str) -> dict:
+def build_parser_json(location: str, parser_name: str) -> dict:
     """Resolve the parser, run argdump, and return it as a Python dict."""
-    obj = load_attr(location, func_name)
+    obj = load_attr(location, parser_name)
     parser = obj() if callable(obj) else obj  # builder function or parser object
 
     result = argdump.dumps(parser)
@@ -109,7 +109,7 @@ def main(argv=None) -> int:
         sys.path.insert(0, str(Path(entry).resolve()))
 
     try:
-        data = build_parser_json(args.location, args.func)
+        data = build_parser_json(args.location, args.parser)
     except (ImportError, AttributeError) as exc:
         print(f"error: {exc}", file=sys.stderr)
         return 1
