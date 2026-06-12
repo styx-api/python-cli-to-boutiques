@@ -1,18 +1,12 @@
 name: Argparse to Boutiques
 description: Create a Boutiques descriptor for a Python CLI based on `argparse.ArgumentParser`
 inputs:
-  location:
-    description: Module path to function that produces the `argparse.ArgumentParser` object
+  parser-location:
+    description: Module path to and name of function that produces the `argparse.ArgumentParser` object. E.g., "my_package.my_module:my_func_name"
     required: true
   token:
     description: GitHub token with permissions to create pull requests. If using the repository's default GITHUB_TOKEN, ensure that it has write permissions for "contents" and "pull-requests" to create pull requests.
     required: true
-  parser:
-    description: Name of the `argparse.ArgumentParser` object-producing function
-    required: false
-  # parser-location:
-  #   description: Module path to and name of function that produces the `argparse.ArgumentParser` object. E.g., "my_package.my_module:my_func_name"
-  #   required: true
   output-path:
     description: Where the output Boutiques description file should be written
     required: true
@@ -37,7 +31,7 @@ runs:
         pip install argdump
 
         # create argdump from argparse
-        python ./scripts/main.py $LOCATION $PARSER --output argdump.json
+        python ./scripts/run_argdump.py $LOCATION $PARSER --output argdump.json
         cat argdump.json
 
         # create boutiques descriptor from argdump
