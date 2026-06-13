@@ -10,6 +10,10 @@ inputs:
   output-path:
     description: Where the output Boutiques description file should be written
     required: true
+  open-pr:
+    description: Whether to open a pull request with the generated descriptor
+    required: false
+    default: true
 
 runs:
   using: composite
@@ -51,12 +55,13 @@ runs:
       id: sanitize
       run: |
         SANITIZED="${{ inputs.parser-location }}"
-        SANITIZED="${SANITIZED//./_}"
+        SANITIZED="${SANITIZED//./__}"
         SANITIZED="${SANITIZED//:/-}"
         echo "branch=argparse-to-boutiques/${SANITIZED}" >> "$GITHUB_OUTPUT"
       shell: bash
 
     - name: Open pull request
+      if: ${{ inputs.open-pr == 'true' }}
       uses: peter-evans/create-pull-request@v8
       with:
         title: "Add/update Boutiques descriptor for ${{ inputs.parser-location }}"
