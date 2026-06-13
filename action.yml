@@ -29,6 +29,14 @@ runs:
   using: composite
   steps:
 
+    - name: Validate inputs
+      run: |
+        if [[ "${{ inputs.parser-type }}" != "argparse" && "${{ inputs.parser-type }}" != "click" ]]; then
+          echo "::error::parser-type must be 'argparse' or 'click', got '${{ inputs.parser-type }}'"
+          exit 1
+        fi
+      shell: bash
+
     - name: Set up Node.js
       uses: actions/setup-node@v6
 
