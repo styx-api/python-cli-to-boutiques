@@ -18,6 +18,10 @@ inputs:
   token:
     description: GitHub token with write permissions for "contents" and "pull-requests". Required if open-pr is true.
     required: false
+  exclude-version:
+    description: Whether to exclude the tool-version field in the Boutiques descriptor even if version information is available. This is enabled by default because dynamic versioning schemes can cause the descriptor to be updated on every commit.
+    required: false
+    default: true
   click-prog-name:
     description: Program name to use for the Click parser type. By default this will be the name of the decorated function.
     required: false
@@ -88,10 +92,15 @@ runs:
         cat $OUTPUT_PATH
 
         # apply user-specified updates
+        UPDATES_DESCRIPTOR_ARGS=()
+        if [[ "${{ inputs.exclude-version }}" == "true" ]]; then
+          UPDATES_DESCRIPTOR_ARGS+=(--exclude-version)
+        fi
         if [[ -n "${{ inputs.updates-file }}" ]]; then
-          python ./scripts/update_descriptor.py \
-            --descriptor $OUTPUT_PATH \
-            --updates ${{ github.workspace }}/${{ inputs.updates-file }}
+          UPDATES_DESCRIPTOR_ARGS+=(--updates ${{ github.workspace }}/${{ inputs.updates-file }})
+        fi
+        if [[ "${#UPDATES_DESCRIPTOR_ARGS[@]}" -gt 0 ]]; then
+          python ./scripts/update_descriptor.py --descriptor $OUTPUT_PATH "${UPDATES_DESCRIPTOR_ARGS[@]}"
           cat $OUTPUT_PATH
         fi
       env:

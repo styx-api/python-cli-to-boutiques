@@ -33,11 +33,13 @@ def set_at_path(obj: dict | list, path_parts: list[str | int], value) -> None:
     obj[path_parts[-1]] = value
 
 
-def apply_updates(descriptor: dict, updates: dict) -> dict:
+def apply_updates(descriptor: dict, exclude_version: bool, updates: dict) -> dict:
     """Return *descriptor* with values from *updates* applied."""
     for path_str, value in updates.items():
         path_parts = parse_path(path_str)
         set_at_path(descriptor, path_parts, value)
+    if exclude_version:
+        descriptor.pop("tool-version", None)
     return descriptor
 
 
@@ -53,9 +55,14 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument(
         "-u",
         "--updates",
-        required=True,
+        required=False,
         type=Path,
         help="Path to a JSON file mapping path expressions to their new values",
+    )
+    parser.add_argument(
+        "--exclude-version",
+        action="store_true",
+        help="Exclude the tool-version field in the Boutiques descriptor even if version information is available.",
     )
     parser.add_argument(
         "-o",
@@ -79,10 +86,13 @@ def main():
 
     with open(args.descriptor) as f:
         descriptor = json.load(f)
-    with open(args.updates) as f:
-        updates = json.load(f)
+    if args.updates is not None:
+        with open(args.updates) as f:
+            updates = json.load(f)
+    else:
+        updates = {}
 
-    descriptor = apply_updates(descriptor, updates)
+    descriptor = apply_updates(descriptor, args.exclude_version, updates)
 
     output_path = args.output or args.descriptor
     output_path.parent.mkdir(parents=True, exist_ok=True)
