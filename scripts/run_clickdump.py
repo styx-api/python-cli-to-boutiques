@@ -31,8 +31,6 @@ def run_clickdump(
     include_hidden: bool = False,
 ):
     """Serialize a click.Command/Group to JSON using clickdump."""
-    print(locals())
-
     module_path, command_name = location.split(":")
     command = load_command(module_path, command_name)
 
