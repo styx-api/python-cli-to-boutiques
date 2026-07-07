@@ -57,7 +57,6 @@ runs:
     - name: Create descriptor
       run: |
         echo "::group::Setting up"
-        set -x
 
         # change directory avoid interference from the user's codebase
         cd ${{ github.action_path }}
@@ -67,12 +66,10 @@ runs:
 
         pip install -U pip
 
-        set +x
         echo "::endgroup::"
 
         echo "::group::Creating the dump file"
         if [[ "$PARSER_TYPE" == "click" ]]; then
-          set -x
 
           # install clickdump from GitHub
           pip install git+https://github.com/michellewang/clickdump.git
@@ -86,32 +83,25 @@ runs:
             CLICK_ARGS+=(--parent "$CLICK_PARENT_LOCATION")
           fi
           python ./scripts/run_clickdump.py "${CLICK_ARGS[@]}" $PARSER_LOCATION
-          set +x
         else
-          set -x
 
           # install argdump
           pip install argdump
 
           # create dump from argparse
           python ./scripts/run_argdump.py --output $DUMP_FILE $PARSER_LOCATION
-          set +x
         fi
         cat $DUMP_FILE
         echo "::endgroup::"
 
         echo "::group::Creating Boutiques descriptor from dump file"
-        set -x
         npx -y --package @styx-api/cli styx build $DUMP_FILE --out styx-out --backend boutiques
-        set +x
         echo "::endgroup::"
 
         echo "::group::Moving descriptor to output path"
-        set -x
         # move descriptor to output path
         mkdir -p $(dirname $OUTPUT_PATH)
         mv ./styx-out/boutiques/descriptor.json $OUTPUT_PATH
-        set +x
         echo "::endgroup::"
 
         echo "::group::Applying user-specified updates"
@@ -126,9 +116,7 @@ runs:
           UPDATES_DESCRIPTOR_ARGS+=(--updates-str "${UPDATES_STR}")
         fi
         if [[ "${#UPDATES_DESCRIPTOR_ARGS[@]}" -gt 0 ]]; then
-          set -x
           python ./scripts/update_descriptor.py --descriptor $OUTPUT_PATH "${UPDATES_DESCRIPTOR_ARGS[@]}"
-          set +x
         fi
         echo "::endgroup::"
 
