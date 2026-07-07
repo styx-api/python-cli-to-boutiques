@@ -68,14 +68,15 @@ runs:
           pip install git+https://github.com/michellewang/clickdump.git
 
           # create dump from click command
-          CLICK_ARGS=()
+          CLICK_ARGS=(--output "$DUMP_FILE")
           if [[ -n "$CLICK_PROG_NAME" ]]; then
             CLICK_ARGS+=(--prog "$CLICK_PROG_NAME")
           fi
           if [[ -n "$CLICK_PARENT_LOCATION" ]]; then
             CLICK_ARGS+=(--parent "$CLICK_PARENT_LOCATION")
           fi
-          python ./scripts/run_clickdump.py --output $DUMP_FILE $PARSER_LOCATION "${CLICK_ARGS[@]}"
+          echo $CLICK_ARGS
+          python ./scripts/run_clickdump.py "${CLICK_ARGS[@]}" $PARSER_LOCATION
         else
           # install argdump
           pip install argdump
