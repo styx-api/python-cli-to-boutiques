@@ -34,6 +34,10 @@ inputs:
   updates-str:
     description: 'JSON string with updates to apply to the generated Boutiques descriptor. The string should contain a map of dot/bracket paths to values (e.g. {"description": "new desc"}). Updates specified this way will override those in the updates file.'
     required: false
+  validate:
+    description: Whether to validate the generated Boutiques descriptor. If this is set to true, the action will fail if the descriptor is invalid.
+    required: false
+    default: false
 
 runs:
   using: composite
@@ -133,6 +137,17 @@ runs:
         EXCLUDE_VERSION: ${{ inputs.exclude-version }}
         UPDATES_FILE: ${{ inputs.updates-file }}
         UPDATES_STR: ${{ inputs.updates-str }}
+      shell: bash
+
+    - name: Validate descriptor
+      if: ${{ inputs.validate == 'true' }}
+      run: |
+        pip install boutiques
+        bosh validate ${{ github.workspace }}/${{ inputs.output-path }}
+        if [[ $? -ne 0 ]]; then
+          echo "::error::Descriptor is invalid :("
+          exit 1
+        fi
       shell: bash
 
     - name: Sanitize branch name
