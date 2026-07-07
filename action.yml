@@ -71,8 +71,8 @@ runs:
         echo "::group::Creating the dump file"
         if [[ "$PARSER_TYPE" == "click" ]]; then
 
-          # install clickdump from GitHub
-          pip install git+https://github.com/michellewang/clickdump.git
+          # install clickdump
+          pip install clickdump
 
           # create dump from click command
           CLICK_ARGS=(--output "$DUMP_FILE")
