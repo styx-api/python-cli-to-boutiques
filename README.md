@@ -16,6 +16,7 @@ GitHub Action to create a [Boutiques descriptor](https://boutiques.github.io/) f
 | `exclude-version` | Whether to exclude the `tool-version` field in the Boutiques descriptor even if version information is available. Enabled by default because dynamic versioning schemes can cause the descriptor to be updated on every commit. | no | `true` |
 | `updates-file` | Path to a JSON file with updates to apply to the generated Boutiques descriptor. The file should contain a map of dot/bracket paths to values (e.g. `{"description": "new desc"}`). | no | — |
 | `updates-str` | JSON string with updates to apply to the generated Boutiques descriptor. The string should contain a map of dot/bracket paths to values (e.g. `{"description": "new desc"}`). Updates specified this way will override those in the updates file. | no | — |
+| `validate` | Whether to validate the generated Boutiques descriptor using `bosh validate` from the latest version of Boutiques. If this is set to true, the action will fail if the descriptor is invalid. **NOTE: Validation failure is currently expected because Boutiques is not yet compatible with descriptors following the `0.5+styx` schema. See https://github.com/boutiques/boutiques/issues/751 for latest integration updates.** | no | `false` |
 
 ## Example workflows
 
