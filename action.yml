@@ -107,7 +107,7 @@ runs:
         SANITIZED="${{ inputs.parser-location }}"
         SANITIZED="${SANITIZED//./__}"
         SANITIZED="${SANITIZED//:/-}"
-        echo "branch=argparse-to-boutiques/${SANITIZED}" >> "$GITHUB_OUTPUT"
+        echo "branch=python-cli-to-boutiques/${SANITIZED}" >> "$GITHUB_OUTPUT"
       shell: bash
 
     - name: Open pull request
