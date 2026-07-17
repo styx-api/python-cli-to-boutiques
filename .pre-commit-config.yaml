@@ -17,7 +17,6 @@ repos:
     -   id: check-yaml
     -   id: end-of-file-fixer
     -   id: trailing-whitespace
-        exclude: .*\.tsv
     -   id: check-toml
 - repo: https://github.com/astral-sh/ruff-pre-commit
   # Ruff version.
@@ -25,6 +24,7 @@ repos:
   hooks:
     # Run the linter.
     - id: ruff-check
+      args: [ --fix ]
     # Run the formatter.
     - id: ruff-format
 -   repo: https://github.com/codespell-project/codespell
