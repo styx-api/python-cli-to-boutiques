@@ -1,6 +1,8 @@
 #!/usr/bin/env python
 """Update a Boutiques descriptor JSON using dot/bracket path notation."""
 
+from __future__ import annotations
+
 import argparse
 import json
 import re
@@ -25,11 +27,15 @@ def set_at_path(obj: dict | list, path_parts: list[str | int], value) -> None:
     """Navigate *path_parts* through *obj* and set *value* at the leaf."""
     for part in path_parts[:-1]:
         if isinstance(part, int):
+            if not isinstance(obj, list):
+                raise TypeError(f"Expected list, got {type(obj).__name__}")
             obj = obj[part]
         else:
             if part not in obj:
                 obj[part] = {}
             obj = obj[part]
+    if isinstance(path_parts[-1], int) and not isinstance(obj, list):
+        raise TypeError(f"Expected list, got {type(obj).__name__}")
     obj[path_parts[-1]] = value
 
 
