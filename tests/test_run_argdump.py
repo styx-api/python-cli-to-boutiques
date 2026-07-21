@@ -78,7 +78,7 @@ class TestBuildParser:
         assert args.indent == 2
         assert args.prog is None
 
-    def test_custom_output_and_indent(self):
+    def test_custom_args(self):
         parser = build_parser()
         args = parser.parse_args(
             [
