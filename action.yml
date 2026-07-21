@@ -59,7 +59,7 @@ runs:
           exit 2
         fi
         if [[ ! -z "${{ inputs.click-prog-name }}" && ! -z "${{ inputs.prog-name }}" ]]; then
-          echo "::warning::Both click-prog-name and prog-name were provided. The prog-name will be used."
+          echo "::warning::Both click-prog-name and prog-name were provided: using prog-name."
         fi
       shell: bash
 
@@ -90,7 +90,7 @@ runs:
       env:
         PARSER_TYPE: ${{ inputs.parser-type }}
         PARSER_LOCATION: ${{ inputs.parser-location }}
-        PROG_NAME: ${{ inputs.prog-name }} || ${{ inputs.click-prog-name }}
+        PROG_NAME: ${{ inputs.prog-name || inputs.click-prog-name }}
         OUTPUT_PATH: ${{ github.workspace }}/${{ inputs.output-path }}
         DUMP_FILE: dump.json
         CLICK_PARENT_LOCATION: ${{ inputs.click-parent-location }}
