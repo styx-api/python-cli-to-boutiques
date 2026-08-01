@@ -26,7 +26,9 @@ def _base_env(tmp_path: Path) -> dict[str, str]:
 
 
 def _run(
-    tmp_path: Path, env_overrides: dict[str, str] | None = None
+    tmp_path: Path,
+    env_overrides: dict[str, str] | None = None,
+    check=True,
 ) -> subprocess.CompletedProcess:
     (tmp_path / "scripts").symlink_to(REPO_ROOT / "scripts")
     env = _base_env(tmp_path)
@@ -38,6 +40,7 @@ def _run(
         env=env,
         capture_output=True,
         text=True,
+        check=check,
     )
 
 
@@ -130,7 +133,7 @@ class TestUpdateDescriptor:
 
 class TestErrorCases:
     def test_unknown_parser_type_exits(self, tmp_path):
-        result = _run(tmp_path, {"PARSER_TYPE": "invalid"})
+        result = _run(tmp_path, {"PARSER_TYPE": "invalid"}, check=False)
         assert result.returncode != 0
 
 
