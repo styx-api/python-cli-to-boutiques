@@ -3,7 +3,6 @@ import json
 from pathlib import Path
 
 import pytest
-
 from run_argdump import build_parser, load_parser, run_argdump
 
 

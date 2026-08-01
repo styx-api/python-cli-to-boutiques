@@ -2,7 +2,6 @@ import argparse
 from pathlib import Path
 
 import pytest
-
 from update_descriptor import apply_updates, build_parser, parse_path, set_at_path
 
 

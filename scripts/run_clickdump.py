@@ -4,7 +4,6 @@
 import argparse
 import importlib
 from pathlib import Path
-from typing import Optional
 
 import clickdump
 
@@ -26,8 +25,8 @@ def run_clickdump(
     location: str,
     output_path: Path,
     indent: int = DEFAULT_INDENT,
-    prog: Optional[str] = None,
-    parent_location: Optional[str] = None,
+    prog: str | None = None,
+    parent_location: str | None = None,
     include_hidden: bool = False,
 ):
     """Serialize a click.Command/Group to JSON using clickdump."""
