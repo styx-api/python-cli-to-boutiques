@@ -4,7 +4,6 @@ from pathlib import Path
 
 import click
 import pytest
-
 from run_clickdump import build_parser, load_command, run_clickdump
 
 
@@ -71,7 +70,7 @@ class TestRunClickdump:
         self, click_command, click_group, _make_fake_module, tmp_path
     ):
         mod = _make_fake_module("dump_cmd_parent_mod", "hello", click_command)
-        setattr(mod, "cli", click_group)
+        mod.cli = click_group
         out = tmp_path / "out.json"
         run_clickdump(
             "dump_cmd_parent_mod:hello",
